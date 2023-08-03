@@ -2,8 +2,6 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useDispatch, useSelector } from 'react-redux';
 
-import { addContacts } from 'redux/contactsSlice';
-
 import {
   ContactsForms,
   ContactsLabel,
@@ -11,10 +9,11 @@ import {
   ContactsInput,
   Span,
 } from './ContactsForm.styled';
+import { addContact } from 'redux/options';
+import { selectContacts } from 'redux/selectors';
 
 export const ContactsForm = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
-
+  const contacts = useSelector(selectContacts);
   const dispatch = useDispatch();
 
   const formSubmit = e => {
@@ -27,7 +26,11 @@ export const ContactsForm = () => {
     if (filterNameContact) {
       return toast.error(`${name} is already in contacts.`);
     }
-    dispatch(addContacts(name, number));
+    const contact = {
+      name,
+      number,
+    };
+    dispatch(addContact(contact));
 
     form.reset();
   };

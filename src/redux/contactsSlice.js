@@ -1,28 +1,51 @@
-import { createSlice, nanoid } from '@reduxjs/toolkit';
+import { createSlice, isAnyOf } from '@reduxjs/toolkit';
+import { addContact, fetchContacts, deleteContact } from './options';
+import {
+  addFulfilledContacts,
+  contactsFulfilled,
+  deleteFulfilledContacts,
+  fetchFulfilledContacts,
+  pendingContacts,
+  rejectedContacts,
+} from 'services/contactSliceFunction';
 
 const tasksInitialState = {
   contacts: [],
+  isLoading: false,
+  error: null,
 };
 
 export const contactsSlice = createSlice({
   name: 'contacts',
   initialState: tasksInitialState,
-  reducers: {
-    addContacts: {
-      reducer: (state, action) => {
-        state.contacts.push(action.payload);
-      },
-      prepare: (name, number) => {
-        const id = nanoid();
-        return { payload: { name, number, id } };
-      },
-    },
-    deleteContact: (state, action) => {
-      state.contacts = state.contacts.filter(
-        contact => contact.id !== action.payload
+  extraReducers: builder => {
+    builder
+      .addCase(fetchContacts.fulfilled, fetchFulfilledContacts)
+      .addCase(addContact.fulfilled, addFulfilledContacts)
+      .addCase(deleteContact.fulfilled, deleteFulfilledContacts)
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.fulfilled,
+          addContact.fulfilled,
+          deleteContact.fulfilled
+        ),
+        contactsFulfilled
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.pending,
+          addContact.pending,
+          deleteContact.pending
+        ),
+        pendingContacts
+      )
+      .addMatcher(
+        isAnyOf(
+          fetchContacts.rejected,
+          addContact.rejected,
+          deleteContact.rejected
+        ),
+        rejectedContacts
       );
-    },
   },
 });
-
-export const { addContacts, deleteContact } = contactsSlice.actions;

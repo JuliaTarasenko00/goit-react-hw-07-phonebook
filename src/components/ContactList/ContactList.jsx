@@ -7,22 +7,19 @@ import {
   ContactListUl,
 } from './Contact.styled';
 
-import { deleteContact } from 'redux/contactsSlice';
+import { deleteContact } from 'redux/options';
+import { selectorFilterContact, selectorIsLoading } from 'redux/selectors';
 
 export const ContactList = () => {
-  const contacts = useSelector(state => state.contacts.contacts);
-
-  const filter = useSelector(state => state.filters.filters);
+  const contactsFilteredByName = useSelector(selectorFilterContact);
+  const isLoading = useSelector(selectorIsLoading);
   const dispatch = useDispatch();
 
-  const contactsFilteredByName = contacts?.filter(contact =>
-    contact.name.toLowerCase().includes(filter)
-  );
-
   const deleteContacts = id => dispatch(deleteContact(id));
+
   return (
     <>
-      {contactsFilteredByName.length === 0 && (
+      {contactsFilteredByName.length === 0 && !isLoading && (
         <p style={{ marginTop: '10px', color: 'red' }}>
           Your contacts will be here 😉
         </p>
